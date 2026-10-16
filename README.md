@@ -57,7 +57,7 @@ Daraja and Statum both need public HTTPS callback URLs. To test callbacks locall
 | `STATUM_CONSUMER_KEY` / `STATUM_CONSUMER_SECRET` | from the Statum dashboard |
 
 You don't need to set `PUBLIC_BASE_URL` or `ALLOWED_HOSTS` on Railway. Both are read from `RAILWAY_PUBLIC_DOMAIN`.
-`railway.json` runs `collectstatic` at build time and `migrate` before each deploy, and it health-checks `/health/`.
+`railway.json` runs `collectstatic` at build time and `migrate` each time the app starts. `/health/` checks the database too, so a deploy with missing tables fails instead of going live.
 
 4. Create an admin user: run `railway ssh` (pick the app service), then `python manage.py createsuperuser`.
 5. Register the callback URLs:

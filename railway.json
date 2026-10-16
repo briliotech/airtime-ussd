@@ -5,8 +5,7 @@
     "buildCommand": "python manage.py collectstatic --noinput"
   },
   "deploy": {
-    "preDeployCommand": ["python manage.py migrate --noinput"],
-    "startCommand": "gunicorn quicktop.wsgi --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 60",
+    "startCommand": "sh -c 'python manage.py migrate --noinput && exec gunicorn quicktop.wsgi --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 60'",
     "healthcheckPath": "/health/",
     "restartPolicyType": "ON_FAILURE"
   }
