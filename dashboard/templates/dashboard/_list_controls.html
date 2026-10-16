@@ -1,17 +1,17 @@
 {% load dashboard_tags %}
 <form method="get" class="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center">
   <div class="relative w-full sm:max-w-md">
-    <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-zinc-500">{% icon "search" %}</span>
+    <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-fg-subtle">{% icon "search" %}</span>
     <input type="search" name="q" value="{{ q }}" placeholder="{{ placeholder }}" class="input pl-9">
   </div>
   {% if status_choices %}
   <div class="relative">
-    <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-zinc-500">{% icon "filter" "size-3.5" %}</span>
+    <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-fg-subtle">{% icon "filter" "size-3.5" %}</span>
     <select name="status" onchange="this.form.submit()" class="input appearance-none pr-8 pl-8 sm:w-52">
       <option value="">All statuses</option>
       {% for value, label in status_choices %}<option value="{{ value }}" {% if value == status %}selected{% endif %}>{{ label }}</option>{% endfor %}
     </select>
-    <span class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-500">{% icon "chevron-right" "size-3.5 rotate-90" %}</span>
+    <span class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-fg-subtle">{% icon "chevron-right" "size-3.5 rotate-90" %}</span>
   </div>
   {% endif %}
   <div class="flex gap-2">

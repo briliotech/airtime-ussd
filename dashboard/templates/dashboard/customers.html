@@ -14,20 +14,20 @@
       <tr>
         <td>
           <a href="{% url 'dashboard:purchases' %}?q={{ c.phone_number }}" class="group inline-flex items-center gap-3">
-            <span class="grid size-8 place-items-center rounded-full bg-gradient-to-br from-emerald-400/20 to-cyan-400/20 font-mono text-[11px] text-emerald-200 ring-1 ring-white/10">{{ c.phone_number|slice:"-2:" }}</span>
-            <span class="font-mono text-[13px] text-zinc-200 group-hover:text-emerald-300">{{ c.phone_number|phone }}</span>
+            <span class="grid size-8 place-items-center rounded-full bg-gradient-to-br from-emerald-400/20 to-cyan-400/20 font-mono text-[11px] text-emerald-700 ring-1 ring-line-strong dark:text-emerald-200">{{ c.phone_number|slice:"-2:" }}</span>
+            <span class="font-mono text-[13px] text-fg group-hover:text-emerald-600 dark:group-hover:text-emerald-300">{{ c.phone_number|phone }}</span>
           </a>
         </td>
-        <td class="text-zinc-400">{{ c.network|default:"—" }}</td>
-        <td class="text-right font-medium">{{ c.purchase_count }}</td>
+        <td class="text-fg-muted">{{ c.network|default:"—" }}</td>
+        <td class="text-right font-medium text-fg">{{ c.purchase_count }}</td>
         <td class="text-right">{{ c.delivered_value|kes }}</td>
-        <td class="text-zinc-500">{{ c.last_purchase|date:"d M · H:i"|default:"—" }}</td>
-        <td class="text-zinc-500">{{ c.last_seen_at|date:"d M · H:i" }}</td>
-        <td class="text-zinc-500">{{ c.created_at|date:"d M Y" }}</td>
+        <td class="text-fg-subtle">{{ c.last_purchase|date:"d M · H:i"|default:"—" }}</td>
+        <td class="text-fg-subtle">{{ c.last_seen_at|date:"d M · H:i" }}</td>
+        <td class="text-fg-subtle">{{ c.created_at|date:"d M Y" }}</td>
       </tr>
     {% empty %}
-      <tr><td colspan="7" class="py-16 text-center text-zinc-500">
-        <div class="mx-auto mb-3 grid size-10 place-items-center rounded-xl border border-white/10 bg-white/[0.03] text-zinc-400">{% icon "users" %}</div>
+      <tr><td colspan="7" class="py-16 text-center text-fg-subtle">
+        <div class="mx-auto mb-3 grid size-10 place-items-center rounded-xl border border-line-strong bg-tint text-fg-muted">{% icon "users" %}</div>
         No customers found.
       </td></tr>
     {% endfor %}

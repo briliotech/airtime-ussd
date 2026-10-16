@@ -4,68 +4,91 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Dashboard{% endblock %} · QuickTop</title>
+  {# Apply the saved theme before first paint so the page doesn't flash. #}
+  <script>
+    (function () {
+      var saved = null;
+      try { saved = localStorage.getItem('qt-theme'); } catch (e) {}
+      var dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.classList.toggle('dark', dark);
+    })();
+  </script>
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'dashboard/favicon-32.png' %}">
+  <link rel="icon" type="image/png" sizes="64x64" href="{% static 'dashboard/favicon-64.png' %}">
+  <link rel="apple-touch-icon" href="{% static 'dashboard/logo.png' %}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'dashboard/app.css' %}">
   {% block head %}{% endblock %}
 </head>
-<body class="min-h-screen bg-zinc-950 font-sans text-zinc-100 antialiased selection:bg-emerald-400/30">
+<body class="min-h-screen bg-app font-sans text-fg antialiased selection:bg-emerald-400/30">
 
-  {# Ambient background: top glow + fading grid #}
+  {# Ambient background: soft glows + fading grid #}
   <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-    <div class="absolute -top-40 left-1/2 h-[480px] w-[900px] -translate-x-1/2 rounded-full bg-emerald-500/10 blur-[120px]"></div>
-    <div class="absolute top-20 -right-40 h-[360px] w-[520px] rounded-full bg-cyan-500/[0.07] blur-[120px]"></div>
-    <div class="absolute inset-0 bg-[linear-gradient(to_right,rgb(255_255_255/0.035)_1px,transparent_1px),linear-gradient(to_bottom,rgb(255_255_255/0.035)_1px,transparent_1px)] bg-[size:56px_56px] [mask-image:radial-gradient(ellipse_70%_55%_at_50%_0%,black,transparent)]"></div>
+    <div class="absolute -top-40 left-1/2 h-[480px] w-[900px] -translate-x-1/2 rounded-full bg-[var(--glow-a)] blur-[120px]"></div>
+    <div class="absolute top-20 -right-40 h-[360px] w-[520px] rounded-full bg-[var(--glow-b)] blur-[120px]"></div>
+    <div class="absolute inset-0 bg-[linear-gradient(to_right,var(--grid)_1px,transparent_1px),linear-gradient(to_bottom,var(--grid)_1px,transparent_1px)] bg-[size:56px_56px] [mask-image:radial-gradient(ellipse_70%_55%_at_50%_0%,black,transparent)]"></div>
   </div>
 
   <div class="flex min-h-screen">
     {# Sidebar #}
-    <aside class="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-white/[0.06] bg-zinc-950/50 px-3 py-5 backdrop-blur-xl lg:flex">
+    <aside class="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-line bg-surface px-3 py-5 backdrop-blur-xl lg:flex">
       <a href="{% url 'dashboard:overview' %}" class="mb-8 flex items-center gap-3 px-2">
-        <span class="grid size-9 place-items-center rounded-xl bg-gradient-to-br from-emerald-300 via-emerald-400 to-cyan-400 text-emerald-950 shadow-[0_0_24px_-4px_rgb(52_211_153/0.7)]">{% icon "zap" "size-5" %}</span>
+        <img src="{% static 'dashboard/logo.png' %}" alt="QuickTop" class="size-11 -my-1 -ml-1">
         <span class="leading-tight">
           <span class="block text-[15px] font-semibold tracking-tight">QuickTop</span>
-          <span class="block text-xs text-zinc-500">Operations console</span>
+          <span class="block text-xs text-fg-subtle">Operations console</span>
         </span>
       </a>
 
-      <p class="mb-2 px-3 text-[11px] font-medium tracking-wider text-zinc-600 uppercase">Monitor</p>
+      <p class="mb-2 px-3 text-[11px] font-medium tracking-wider text-fg-faint uppercase">Monitor</p>
       <nav class="space-y-0.5">
         <a href="{% url 'dashboard:overview' %}" class="nav-link {% if active == 'overview' %}is-active{% endif %}">{% icon "dashboard" %}Overview</a>
-        <a href="{% url 'dashboard:purchases' %}" class="nav-link {% if active == 'purchases' %}is-active{% endif %}">{% icon "zap" %}Airtime purchases</a>
+        <a href="{% url 'dashboard:purchases' %}" class="nav-link {% if active == 'purchases' %}is-active{% endif %}">{% icon "phone" %}Airtime purchases</a>
         <a href="{% url 'dashboard:payments' %}" class="nav-link {% if active == 'payments' %}is-active{% endif %}">{% icon "wallet" %}M-Pesa payments</a>
         <a href="{% url 'dashboard:sessions' %}" class="nav-link {% if active == 'sessions' %}is-active{% endif %}">{% icon "terminal" %}USSD sessions</a>
         <a href="{% url 'dashboard:customers' %}" class="nav-link {% if active == 'customers' %}is-active{% endif %}">{% icon "users" %}Customers</a>
       </nav>
 
-      <p class="mt-8 mb-2 px-3 text-[11px] font-medium tracking-wider text-zinc-600 uppercase">System</p>
+      <p class="mt-8 mb-2 px-3 text-[11px] font-medium tracking-wider text-fg-faint uppercase">System</p>
       <nav class="space-y-0.5">
-        <a href="{% url 'admin:index' %}" class="nav-link">{% icon "shield" %}Django admin</a>
+        <a href="{% url 'admin:index' %}" class="nav-link">{% icon "shield" %}Admin</a>
       </nav>
 
-      <div class="mt-auto rounded-xl border border-white/[0.06] bg-white/[0.02] p-3">
-        <div class="flex items-center gap-3">
-          <span class="grid size-8 place-items-center rounded-full bg-gradient-to-br from-zinc-700 to-zinc-800 text-xs font-semibold uppercase ring-1 ring-white/10">{{ request.user.get_username|slice:":2" }}</span>
-          <div class="min-w-0 flex-1">
-            <p class="truncate text-sm font-medium">{{ request.user.get_username }}</p>
-            <p class="text-xs text-zinc-500">Staff</p>
+      <div class="mt-auto space-y-3">
+        <button type="button" data-theme-toggle class="nav-link w-full">
+          <span class="dark:hidden">{% icon "moon" %}</span><span class="hidden dark:inline">{% icon "sun" %}</span>
+          <span class="dark:hidden">Dark mode</span><span class="hidden dark:inline">Light mode</span>
+        </button>
+        <div class="rounded-xl border border-line bg-tint p-3">
+          <div class="flex items-center gap-3">
+            <span class="grid size-8 place-items-center rounded-full bg-surface-solid text-xs font-semibold uppercase ring-1 ring-line-strong">{{ request.user.get_username|slice:":2" }}</span>
+            <div class="min-w-0 flex-1">
+              <p class="truncate text-sm font-medium">{{ request.user.get_username }}</p>
+              <p class="text-xs text-fg-subtle">Staff</p>
+            </div>
+            <form method="post" action="{% url 'admin:logout' %}">{% csrf_token %}
+              <button type="submit" class="btn btn-ghost size-8 px-0" title="Log out">{% icon "logout" %}</button>
+            </form>
           </div>
-          <form method="post" action="{% url 'admin:logout' %}">{% csrf_token %}
-            <button type="submit" class="btn btn-ghost size-8 px-0" title="Log out">{% icon "logout" %}</button>
-          </form>
         </div>
       </div>
     </aside>
 
     <div class="min-w-0 flex-1">
       {# Mobile top bar #}
-      <div class="sticky top-0 z-20 border-b border-white/[0.06] bg-zinc-950/80 backdrop-blur-xl lg:hidden">
+      <div class="sticky top-0 z-20 border-b border-line bg-surface backdrop-blur-xl lg:hidden">
         <div class="flex items-center justify-between px-4 py-3">
           <a href="{% url 'dashboard:overview' %}" class="flex items-center gap-2 font-semibold">
-            <span class="grid size-7 place-items-center rounded-lg bg-gradient-to-br from-emerald-300 to-cyan-400 text-emerald-950">{% icon "zap" "size-4" %}</span>QuickTop
+            <img src="{% static 'dashboard/logo.png' %}" alt="QuickTop" class="size-8">QuickTop
           </a>
-          <form method="post" action="{% url 'admin:logout' %}">{% csrf_token %}<button class="btn btn-ghost btn-sm">{% icon "logout" "size-3.5" %}Log out</button></form>
+          <div class="flex items-center gap-1">
+            <button type="button" data-theme-toggle class="btn btn-ghost size-8 px-0" title="Switch theme">
+              <span class="dark:hidden">{% icon "moon" %}</span><span class="hidden dark:inline">{% icon "sun" %}</span>
+            </button>
+            <form method="post" action="{% url 'admin:logout' %}">{% csrf_token %}<button class="btn btn-ghost btn-sm">{% icon "logout" "size-3.5" %}Log out</button></form>
+          </div>
         </div>
         <nav class="flex gap-1 overflow-x-auto px-3 pb-3 text-sm">
           <a href="{% url 'dashboard:overview' %}" class="nav-link shrink-0 {% if active == 'overview' %}is-active{% endif %}">Overview</a>
@@ -73,6 +96,7 @@
           <a href="{% url 'dashboard:payments' %}" class="nav-link shrink-0 {% if active == 'payments' %}is-active{% endif %}">Payments</a>
           <a href="{% url 'dashboard:sessions' %}" class="nav-link shrink-0 {% if active == 'sessions' %}is-active{% endif %}">Sessions</a>
           <a href="{% url 'dashboard:customers' %}" class="nav-link shrink-0 {% if active == 'customers' %}is-active{% endif %}">Customers</a>
+          <a href="{% url 'admin:index' %}" class="nav-link shrink-0">Admin</a>
         </nav>
       </div>
 
@@ -80,7 +104,7 @@
         {% if messages %}
         <div class="mb-6 space-y-2">
           {% for m in messages %}
-          <div class="flex items-start gap-3 rounded-xl border px-4 py-3 text-sm backdrop-blur-xl {% if m.tags == 'error' %}border-rose-400/20 bg-rose-400/10 text-rose-200{% else %}border-emerald-400/20 bg-emerald-400/10 text-emerald-200{% endif %}">
+          <div class="flex items-start gap-3 rounded-xl border px-4 py-3 text-sm backdrop-blur-xl {% if m.tags == 'error' %}border-rose-500/25 bg-rose-500/10 text-rose-700 dark:text-rose-200{% else %}border-emerald-500/25 bg-emerald-500/10 text-emerald-700 dark:text-emerald-200{% endif %}">
             {% if m.tags == 'error' %}{% icon "alert" "size-4 mt-0.5 shrink-0" %}{% else %}{% icon "retry" "size-4 mt-0.5 shrink-0" %}{% endif %}
             <span>{{ m }}</span>
           </div>
@@ -91,7 +115,7 @@
         <header class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">{% block heading %}{% endblock %}</h1>
-            <p class="mt-1 text-sm text-zinc-500">{% block subheading %}{% endblock %}</p>
+            <p class="mt-1 text-sm text-fg-subtle">{% block subheading %}{% endblock %}</p>
           </div>
           <div class="flex items-center gap-2">{% block actions %}{% endblock %}</div>
         </header>
@@ -100,6 +124,16 @@
       </main>
     </div>
   </div>
+
+  <script>
+    document.querySelectorAll('[data-theme-toggle]').forEach(function (button) {
+      button.addEventListener('click', function () {
+        var dark = document.documentElement.classList.toggle('dark');
+        try { localStorage.setItem('qt-theme', dark ? 'dark' : 'light'); } catch (e) {}
+        document.dispatchEvent(new CustomEvent('qt:themechange'));
+      });
+    });
+  </script>
   {% block scripts %}{% endblock %}
 </body>
 </html>

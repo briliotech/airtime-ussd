@@ -4,64 +4,52 @@
 {% block heading %}Overview{% endblock %}
 {% block subheading %}Sales, payments and USSD traffic across QuickTop{% endblock %}
 {% block actions %}
-  <span class="hidden items-center gap-2 rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2 text-xs text-zinc-400 sm:inline-flex">{% icon "clock" "size-3.5" %}{{ now|date:"D d M · H:i" }} EAT</span>
+  <span class="hidden items-center gap-2 rounded-lg border border-line-strong bg-surface px-3 py-2 text-xs text-fg-muted sm:inline-flex">{% icon "clock" "size-3.5" %}{{ now|date:"D d M · H:i" }} EAT</span>
   <a href="" class="btn btn-outline">{% icon "refresh" "size-3.5" %}Refresh</a>
 {% endblock %}
 
 {% block content %}
 {# KPI cards #}
 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-  <div class="card group overflow-hidden p-5">
+  <div class="card overflow-hidden p-5">
     <div class="absolute -top-16 -right-16 size-40 rounded-full bg-emerald-400/10 blur-3xl"></div>
-    <div class="flex items-center justify-between">
-      <p class="text-sm text-zinc-400">Collected today</p>
-      <span class="grid size-8 place-items-center rounded-lg border border-emerald-400/20 bg-emerald-400/10 text-emerald-300">{% icon "banknote" %}</span>
-    </div>
-    <p class="mt-4 text-3xl font-semibold tracking-tight tabular-nums">{{ stats.collected_today|kes }}</p>
-    <div class="mt-3 flex items-center gap-3 text-xs text-zinc-500">
-      <span>7d <span class="font-medium text-zinc-300">{{ stats.collected_week|kes }}</span></span>
-      <span class="h-3 w-px bg-white/10"></span>
-      <span>All time <span class="font-medium text-zinc-300">{{ stats.collected_all|kes }}</span></span>
+    <p class="text-sm text-fg-muted">Collected today</p>
+    <p class="mt-3 text-3xl font-semibold tracking-tight tabular-nums">{{ stats.collected_today|kes }}</p>
+    <div class="mt-3 flex items-center gap-3 text-xs text-fg-subtle">
+      <span>7d <span class="font-medium text-fg">{{ stats.collected_week|kes }}</span></span>
+      <span class="h-3 w-px bg-line-strong"></span>
+      <span>All time <span class="font-medium text-fg">{{ stats.collected_all|kes }}</span></span>
     </div>
   </div>
 
-  <div class="card group overflow-hidden p-5">
+  <div class="card overflow-hidden p-5">
     <div class="absolute -top-16 -right-16 size-40 rounded-full bg-cyan-400/10 blur-3xl"></div>
-    <div class="flex items-center justify-between">
-      <p class="text-sm text-zinc-400">Airtime delivered</p>
-      <span class="grid size-8 place-items-center rounded-lg border border-cyan-400/20 bg-cyan-400/10 text-cyan-300">{% icon "zap" %}</span>
-    </div>
-    <p class="mt-4 text-3xl font-semibold tracking-tight tabular-nums">{{ stats.delivered_value|kes }}</p>
-    <div class="mt-3 flex items-center gap-3 text-xs text-zinc-500">
-      <span><span class="font-medium text-zinc-300">{{ stats.delivered_count }}</span> top-up{{ stats.delivered_count|pluralize }}</span>
-      <span class="h-3 w-px bg-white/10"></span>
-      <span>Statum cost <span class="font-medium text-zinc-300">{{ stats.statum_charges|kes }}</span></span>
+    <p class="text-sm text-fg-muted">Airtime delivered</p>
+    <p class="mt-3 text-3xl font-semibold tracking-tight tabular-nums">{{ stats.delivered_value|kes }}</p>
+    <div class="mt-3 flex items-center gap-3 text-xs text-fg-subtle">
+      <span><span class="font-medium text-fg">{{ stats.delivered_count }}</span> top-up{{ stats.delivered_count|pluralize }}</span>
+      <span class="h-3 w-px bg-line-strong"></span>
+      <span>Statum cost <span class="font-medium text-fg">{{ stats.statum_charges|kes }}</span></span>
     </div>
   </div>
 
   <div class="card overflow-hidden p-5">
     <div class="absolute -top-16 -right-16 size-40 rounded-full bg-violet-400/10 blur-3xl"></div>
-    <div class="flex items-center justify-between">
-      <p class="text-sm text-zinc-400">Payment success</p>
-      <span class="grid size-8 place-items-center rounded-lg border border-violet-400/20 bg-violet-400/10 text-violet-300">{% icon "activity" %}</span>
+    <p class="text-sm text-fg-muted">Payment success</p>
+    <p class="mt-3 text-3xl font-semibold tracking-tight tabular-nums">{% if stats.success_rate is None %}—{% else %}{{ stats.success_rate }}<span class="text-xl text-fg-subtle">%</span>{% endif %}</p>
+    <div class="mt-4 h-1.5 overflow-hidden rounded-full bg-tint">
+      <div class="h-full rounded-full bg-gradient-to-r from-violet-500 to-cyan-400 dark:shadow-[0_0_12px_rgb(139_92_246/0.6)]" style="width: {{ stats.success_rate|default:0 }}%"></div>
     </div>
-    <p class="mt-4 text-3xl font-semibold tracking-tight tabular-nums">{% if stats.success_rate is None %}—{% else %}{{ stats.success_rate }}<span class="text-xl text-zinc-500">%</span>{% endif %}</p>
-    <div class="mt-4 h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
-      <div class="h-full rounded-full bg-gradient-to-r from-violet-400 to-cyan-400 shadow-[0_0_12px_rgb(139_92_246/0.6)]" style="width: {{ stats.success_rate|default:0 }}%"></div>
-    </div>
-    <p class="mt-2 text-xs text-zinc-500">Of completed STK pushes</p>
+    <p class="mt-2 text-xs text-fg-subtle">Of completed STK pushes</p>
   </div>
 
-  <a href="{% url 'dashboard:purchases' %}?status=failed" class="card group overflow-hidden p-5 transition-colors {% if stats.refunds_due_count %}border-rose-400/30 hover:border-rose-400/50{% else %}hover:border-white/15{% endif %}">
-    {% if stats.refunds_due_count %}<div class="absolute -top-16 -right-16 size-40 rounded-full bg-rose-500/20 blur-3xl"></div>{% endif %}
-    <div class="flex items-center justify-between">
-      <p class="text-sm text-zinc-400">Refunds due</p>
-      <span class="grid size-8 place-items-center rounded-lg border {% if stats.refunds_due_count %}border-rose-400/30 bg-rose-400/15 text-rose-300{% else %}border-white/10 bg-white/[0.04] text-zinc-400{% endif %}">{% icon "alert" %}</span>
-    </div>
-    <p class="mt-4 text-3xl font-semibold tracking-tight tabular-nums {% if stats.refunds_due_count %}text-rose-300{% endif %}">{{ stats.refunds_due_value|kes }}</p>
-    <p class="mt-3 flex items-center gap-1 text-xs text-zinc-500">
+  <a href="{% url 'dashboard:purchases' %}?status=failed" class="card group overflow-hidden p-5 transition-colors {% if stats.refunds_due_count %}border-rose-500/30 hover:border-rose-500/50{% else %}hover:border-line-strong{% endif %}">
+    {% if stats.refunds_due_count %}<div class="absolute -top-16 -right-16 size-40 rounded-full bg-rose-500/15 blur-3xl dark:bg-rose-500/20"></div>{% endif %}
+    <p class="text-sm text-fg-muted">Refunds due</p>
+    <p class="mt-3 text-3xl font-semibold tracking-tight tabular-nums {% if stats.refunds_due_count %}danger-text{% endif %}">{{ stats.refunds_due_value|kes }}</p>
+    <p class="mt-3 flex items-center gap-1 text-xs text-fg-subtle">
       {{ stats.refunds_due_count }} paid, not delivered
-      {% if stats.refunds_due_count %}<span class="ml-auto inline-flex items-center gap-1 text-rose-300 group-hover:underline">Review{% icon "arrow-right" "size-3" %}</span>{% endif %}
+      {% if stats.refunds_due_count %}<span class="danger-text ml-auto inline-flex items-center gap-1 group-hover:underline">Review{% icon "arrow-right" "size-3" %}</span>{% endif %}
     </p>
   </a>
 </div>
@@ -90,22 +78,22 @@
     <div class="relative mx-auto h-44 w-44">
       <canvas id="status-chart"></canvas>
       <div class="pointer-events-none absolute inset-0 grid place-items-center text-center">
-        <div><p class="text-2xl font-semibold tabular-nums">{{ status_total }}</p><p class="text-[11px] text-zinc-500">orders</p></div>
+        <div><p class="text-2xl font-semibold tabular-nums">{{ status_total }}</p><p class="text-[11px] text-fg-subtle">orders</p></div>
       </div>
     </div>
     <ul class="space-y-1 px-5 pt-4 pb-5">
       {% for row in status_counts %}
       <li>
-        <a href="{% url 'dashboard:purchases' %}?status={{ row.status }}" class="flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-white/[0.03]">
-          <span class="size-2 rounded-full" style="background: {{ row.color }}; box-shadow: 0 0 8px {{ row.color }}"></span>
-          <span class="text-zinc-300">{{ row.label }}</span>
+        <a href="{% url 'dashboard:purchases' %}?status={{ row.status }}" class="flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-hover">
+          <span class="size-2 rounded-full" style="background: {{ row.color }}"></span>
+          <span class="text-fg-muted">{{ row.label }}</span>
           <span class="ml-auto font-medium tabular-nums">{{ row.n }}</span>
         </a>
       </li>
       {% endfor %}
     </ul>
     {% else %}
-    <p class="px-5 py-16 text-center text-sm text-zinc-500">No orders yet.</p>
+    <p class="px-5 py-16 text-center text-sm text-fg-subtle">No orders yet.</p>
     {% endif %}
   </div>
 </div>
@@ -123,17 +111,17 @@
       {% for step in funnel %}
       <div>
         <div class="mb-1.5 flex items-baseline justify-between text-sm">
-          <span class="text-zinc-300">{{ step.label }}</span>
-          <span class="tabular-nums"><span class="font-medium">{{ step.n }}</span> <span class="text-xs text-zinc-500">{{ step.pct }}%</span></span>
+          <span class="text-fg-muted">{{ step.label }}</span>
+          <span class="tabular-nums"><span class="font-medium">{{ step.n }}</span> <span class="text-xs text-fg-subtle">{{ step.pct }}%</span></span>
         </div>
-        <div class="h-2 overflow-hidden rounded-full bg-white/[0.05]">
-          <div class="h-full rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400 shadow-[0_0_10px_rgb(52_211_153/0.5)]" style="width: {{ step.pct }}%; opacity: {% cycle '1' '.85' '.7' '.55' %}"></div>
+        <div class="h-2 overflow-hidden rounded-full bg-tint">
+          <div class="h-full rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400 dark:shadow-[0_0_10px_rgb(52_211_153/0.5)]" style="width: {{ step.pct }}%; opacity: {% cycle '1' '.85' '.7' '.55' %}"></div>
         </div>
       </div>
       {% endfor %}
-      <div class="!mt-6 flex items-center justify-between border-t border-white/[0.05] pt-4 text-xs text-zinc-500">
-        <span>Sessions today <span class="font-medium text-zinc-300">{{ stats.sessions_today }}</span></span>
-        <span>Customers <span class="font-medium text-zinc-300">{{ stats.customers }}</span></span>
+      <div class="!mt-6 flex items-center justify-between border-t border-line pt-4 text-xs text-fg-subtle">
+        <span>Sessions today <span class="font-medium text-fg">{{ stats.sessions_today }}</span></span>
+        <span>Customers <span class="font-medium text-fg">{{ stats.customers }}</span></span>
       </div>
     </div>
   </div>
@@ -170,57 +158,71 @@
 <script>
 (function () {
   if (!window.Chart) return;
-  const font = { family: 'Geist, ui-sans-serif, system-ui, sans-serif', size: 11 };
-  Chart.defaults.color = '#71717a';
-  Chart.defaults.font = font;
-  const tooltip = {
-    backgroundColor: 'rgba(9, 9, 11, 0.92)', borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1,
-    titleColor: '#fafafa', bodyColor: '#d4d4d8', padding: 10, cornerRadius: 8, displayColors: false,
-    titleFont: { ...font, size: 12, weight: '600' }, bodyFont: { ...font, size: 12 },
-  };
-  const kes = (v) => 'KES ' + Number(v).toLocaleString('en-KE', { maximumFractionDigits: 0 });
-
   const collections = JSON.parse(document.getElementById('collections-data').textContent);
-  const lineCanvas = document.getElementById('collections-chart');
-  const ctx = lineCanvas.getContext('2d');
-  const fill = ctx.createLinearGradient(0, 0, 0, 240);
-  fill.addColorStop(0, 'rgba(52, 211, 153, 0.35)');
-  fill.addColorStop(1, 'rgba(52, 211, 153, 0)');
-  const stroke = ctx.createLinearGradient(0, 0, lineCanvas.clientWidth || 600, 0);
-  stroke.addColorStop(0, '#34d399');
-  stroke.addColorStop(1, '#22d3ee');
+  const status = JSON.parse(document.getElementById('status-data').textContent);
+  const kes = (v) => 'KES ' + Number(v).toLocaleString('en-KE', { maximumFractionDigits: 0 });
+  const charts = [];
 
-  new Chart(lineCanvas, {
-    type: 'line',
-    data: {
-      labels: collections.labels,
-      datasets: [{
-        data: collections.values, fill: true, backgroundColor: fill, borderColor: stroke, borderWidth: 2,
-        tension: 0.4, pointRadius: 0, pointHoverRadius: 5, pointHoverBackgroundColor: '#34d399',
-        pointHoverBorderColor: '#09090b', pointHoverBorderWidth: 2,
-      }],
-    },
-    options: {
-      maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
-      plugins: { legend: { display: false }, tooltip: { ...tooltip, callbacks: { label: (c) => kes(c.parsed.y) } } },
-      scales: {
-        x: { grid: { display: false }, border: { display: false }, ticks: { maxRotation: 0, autoSkipPadding: 16 } },
-        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, border: { display: false },
-             ticks: { maxTicksLimit: 5, callback: (v) => v >= 1000 ? (v / 1000) + 'k' : v } },
+  function draw() {
+    charts.splice(0).forEach((c) => c.destroy());
+    const dark = document.documentElement.classList.contains('dark');
+    const css = getComputedStyle(document.documentElement);
+    const muted = css.getPropertyValue('--fg-subtle').trim();
+    const surface = css.getPropertyValue('--surface-solid').trim();
+    const font = { family: 'Geist, ui-sans-serif, system-ui, sans-serif', size: 11 };
+    Chart.defaults.color = muted;
+    Chart.defaults.font = font;
+    const tooltip = {
+      backgroundColor: dark ? 'rgba(9, 9, 11, 0.92)' : 'rgba(255, 255, 255, 0.97)',
+      borderColor: dark ? 'rgba(255,255,255,0.1)' : 'rgba(9,9,11,0.1)', borderWidth: 1,
+      titleColor: dark ? '#fafafa' : '#18181b', bodyColor: dark ? '#d4d4d8' : '#3f3f46',
+      padding: 10, cornerRadius: 8, displayColors: false,
+      titleFont: { ...font, size: 12, weight: '600' }, bodyFont: { ...font, size: 12 },
+    };
+
+    const lineCanvas = document.getElementById('collections-chart');
+    const ctx = lineCanvas.getContext('2d');
+    const fill = ctx.createLinearGradient(0, 0, 0, 260);
+    fill.addColorStop(0, dark ? 'rgba(52, 211, 153, 0.35)' : 'rgba(16, 185, 129, 0.22)');
+    fill.addColorStop(1, 'rgba(52, 211, 153, 0)');
+    const stroke = ctx.createLinearGradient(0, 0, lineCanvas.clientWidth || 600, 0);
+    stroke.addColorStop(0, dark ? '#34d399' : '#10b981');
+    stroke.addColorStop(1, dark ? '#22d3ee' : '#06b6d4');
+
+    charts.push(new Chart(lineCanvas, {
+      type: 'line',
+      data: {
+        labels: collections.labels,
+        datasets: [{
+          data: collections.values, fill: true, backgroundColor: fill, borderColor: stroke, borderWidth: 2,
+          tension: 0.4, pointRadius: 0, pointHoverRadius: 5, pointHoverBackgroundColor: '#10b981',
+          pointHoverBorderColor: surface, pointHoverBorderWidth: 2,
+        }],
       },
-    },
-  });
+      options: {
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: { legend: { display: false }, tooltip: { ...tooltip, callbacks: { label: (c) => kes(c.parsed.y) } } },
+        scales: {
+          x: { grid: { display: false }, border: { display: false }, ticks: { maxRotation: 0, autoSkipPadding: 16 } },
+          y: { beginAtZero: true, grid: { color: css.getPropertyValue('--line').trim() }, border: { display: false },
+               ticks: { maxTicksLimit: 5, callback: (v) => v >= 1000 ? (v / 1000) + 'k' : v } },
+        },
+      },
+    }));
 
-  const statusCanvas = document.getElementById('status-chart');
-  if (statusCanvas) {
-    const status = JSON.parse(document.getElementById('status-data').textContent);
-    new Chart(statusCanvas, {
-      type: 'doughnut',
-      data: { labels: status.labels, datasets: [{ data: status.values, backgroundColor: status.colors, borderColor: '#09090b', borderWidth: 3, hoverOffset: 4 }] },
-      options: { cutout: '74%', plugins: { legend: { display: false }, tooltip: { ...tooltip, displayColors: true } } },
-    });
+    const statusCanvas = document.getElementById('status-chart');
+    if (statusCanvas) {
+      charts.push(new Chart(statusCanvas, {
+        type: 'doughnut',
+        data: { labels: status.labels, datasets: [{ data: status.values, backgroundColor: status.colors, borderColor: surface, borderWidth: 3, hoverOffset: 4 }] },
+        options: { cutout: '74%', plugins: { legend: { display: false }, tooltip: { ...tooltip, displayColors: true } } },
+      }));
+    }
   }
+
+  draw();
+  document.addEventListener('qt:themechange', draw);
 })();
 </script>
 {% endblock %}

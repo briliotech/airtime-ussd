@@ -1,6 +1,6 @@
 {% load dashboard_tags %}
 {% if paginator %}
-<div class="flex items-center justify-between gap-4 border-t border-white/[0.05] px-4 py-3 text-xs text-zinc-500">
+<div class="flex items-center justify-between gap-4 border-t border-line px-4 py-3 text-xs text-fg-subtle">
   <span>{% if is_paginated %}Page {{ page_obj.number }} of {{ paginator.num_pages }} · {% endif %}{{ paginator.count }} record{{ paginator.count|pluralize }}</span>
   {% if is_paginated %}
   <div class="flex gap-1.5">

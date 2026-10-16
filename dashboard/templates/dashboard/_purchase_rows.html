@@ -7,16 +7,16 @@
   <tbody>
   {% for p in purchases %}
     <tr>
-      <td class="text-zinc-500">{{ p.created_at|date:"d M · H:i" }}</td>
+      <td class="text-fg-subtle">{{ p.created_at|date:"d M · H:i" }}</td>
       <td>
-        <span class="font-mono text-[13px] text-zinc-200">{{ p.recipient_phone|phone }}</span>
-        {% if full %}<span class="block text-xs text-zinc-500">{% if p.recipient_phone == p.customer.phone_number %}own number{% else %}paid by <span class="font-mono">{{ p.customer.phone_number|phone }}</span>{% endif %}</span>{% endif %}
+        <span class="font-mono text-[13px] text-fg">{{ p.recipient_phone|phone }}</span>
+        {% if full %}<span class="block text-xs text-fg-subtle">{% if p.recipient_phone == p.customer.phone_number %}own number{% else %}paid by <span class="font-mono">{{ p.customer.phone_number|phone }}</span>{% endif %}</span>{% endif %}
       </td>
-      <td class="text-right font-medium text-zinc-100">{{ p.amount|kes }}</td>
+      <td class="text-right font-medium text-fg">{{ p.amount|kes }}</td>
       <td>{% status_badge p.status p.get_status_display %}</td>
-      <td>{% if p.payment.mpesa_receipt_number %}<span class="kbd">{{ p.payment.mpesa_receipt_number }}</span>{% else %}<span class="text-zinc-600">—</span>{% endif %}</td>
+      <td>{% if p.payment.mpesa_receipt_number %}<span class="kbd">{{ p.payment.mpesa_receipt_number }}</span>{% else %}<span class="text-fg-faint">—</span>{% endif %}</td>
       {% if full %}
-      <td class="text-zinc-500"><div class="max-w-[14rem] truncate" title="{{ p.result_desc|default:p.payment.result_desc }}{% if p.statum_charge %} · Statum charged {{ p.statum_charge|kes }}{% endif %}">{{ p.result_desc|default:p.payment.result_desc|default:"" }}</div></td>
+      <td class="text-fg-subtle"><div class="max-w-[14rem] truncate" title="{{ p.result_desc|default:p.payment.result_desc }}{% if p.statum_charge %} · Statum charged {{ p.statum_charge|kes }}{% endif %}">{{ p.result_desc|default:p.payment.result_desc|default:"" }}</div></td>
       {% endif %}
       <td class="text-right">
         {% if p.status == 'failed' and p.payment.status == 'success' %}
@@ -28,8 +28,8 @@
       </td>
     </tr>
   {% empty %}
-    <tr><td colspan="7" class="py-16 text-center text-zinc-500">
-      <div class="mx-auto mb-3 grid size-10 place-items-center rounded-xl border border-white/10 bg-white/[0.03] text-zinc-400">{% icon "zap" %}</div>
+    <tr><td colspan="7" class="py-16 text-center text-fg-subtle">
+      <div class="mx-auto mb-3 grid size-10 place-items-center rounded-xl border border-line-strong bg-tint text-fg-muted">{% icon "phone" %}</div>
       No purchases yet.
     </td></tr>
   {% endfor %}

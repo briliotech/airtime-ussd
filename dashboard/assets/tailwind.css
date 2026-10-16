@@ -1,74 +1,127 @@
 /*
  * Source for dashboard/static/dashboard/app.css. Rebuild after editing templates:
- *   npx @tailwindcss/cli@4.1.11 -i dashboard/assets/tailwind.css -o dashboard/static/dashboard/app.css --minify
+ *   npx @tailwindcss/cli -i dashboard/assets/tailwind.css -o dashboard/static/dashboard/app.css --minify
  */
 @import "tailwindcss";
 
 @source "../templates";
 @source "../templatetags";
 
+/* Theme is a class on <html>, set by the toggle (falls back to the OS preference). */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono", ui-monospace, "Cascadia Mono", monospace;
 }
 
+/* Semantic colours: templates use these so one class works in both themes. */
+@theme inline {
+  --color-app: var(--app);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-subtle: var(--fg-subtle);
+  --color-fg-faint: var(--fg-faint);
+  --color-surface: var(--surface);
+  --color-surface-solid: var(--surface-solid);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-hover: var(--hover);
+  --color-tint: var(--tint);
+}
+
 @layer base {
-  :root { color-scheme: dark; }
+  :root {
+    color-scheme: light;
+    --app: #f6f7f9;
+    --fg: #18181b;
+    --fg-muted: #52525b;
+    --fg-subtle: #71717a;
+    --fg-faint: #a1a1aa;
+    --surface: rgb(255 255 255 / 0.78);
+    --surface-solid: #ffffff;
+    --line: rgb(9 9 11 / 0.08);
+    --line-strong: rgb(9 9 11 / 0.14);
+    --hover: rgb(9 9 11 / 0.03);
+    --tint: rgb(9 9 11 / 0.045);
+    --grid: rgb(9 9 11 / 0.05);
+    --glow-a: rgb(16 185 129 / 0.10);
+    --glow-b: rgb(59 130 246 / 0.07);
+  }
+  .dark {
+    color-scheme: dark;
+    --app: #09090b;
+    --fg: #f4f4f5;
+    --fg-muted: #a1a1aa;
+    --fg-subtle: #71717a;
+    --fg-faint: #52525b;
+    --surface: rgb(24 24 27 / 0.45);
+    --surface-solid: #111113;
+    --line: rgb(255 255 255 / 0.07);
+    --line-strong: rgb(255 255 255 / 0.12);
+    --hover: rgb(255 255 255 / 0.03);
+    --tint: rgb(255 255 255 / 0.05);
+    --grid: rgb(255 255 255 / 0.035);
+    --glow-a: rgb(16 185 129 / 0.10);
+    --glow-b: rgb(59 130 246 / 0.08);
+  }
   body { font-feature-settings: "ss01", "cv11"; }
   ::-webkit-scrollbar { width: 10px; height: 10px; }
-  ::-webkit-scrollbar-thumb { background: rgb(255 255 255 / 0.08); border-radius: 999px; border: 2px solid transparent; background-clip: padding-box; }
+  ::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 999px; border: 2px solid transparent; background-clip: padding-box; }
   ::-webkit-scrollbar-track { background: transparent; }
 }
 
 @layer components {
   /* Surfaces */
   .card {
-    @apply relative rounded-2xl border border-white/[0.07] bg-zinc-900/40 shadow-[inset_0_1px_0_0_rgb(255_255_255/0.04)] backdrop-blur-xl;
+    @apply relative rounded-2xl border border-line bg-surface shadow-[0_1px_2px_rgb(0_0_0/0.04)] backdrop-blur-xl dark:shadow-[inset_0_1px_0_0_rgb(255_255_255/0.04)];
   }
   .card-header { @apply flex items-center justify-between gap-4 px-5 pt-5 pb-3; }
-  .card-title { @apply text-sm font-medium text-zinc-100; }
-  .card-desc { @apply text-xs text-zinc-500; }
+  .card-title { @apply text-sm font-medium text-fg; }
+  .card-desc { @apply text-xs text-fg-subtle; }
 
   /* Navigation */
   .nav-link {
-    @apply flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-zinc-400 transition-colors hover:bg-white/[0.04] hover:text-zinc-100;
+    @apply flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-fg-muted transition-colors hover:bg-tint hover:text-fg;
   }
   .nav-link.is-active {
-    @apply bg-gradient-to-r from-emerald-400/15 to-transparent text-emerald-300 shadow-[inset_2px_0_0_0_var(--color-emerald-400)];
+    @apply bg-gradient-to-r from-emerald-500/12 to-transparent text-emerald-700 shadow-[inset_2px_0_0_0_var(--color-emerald-500)] dark:from-emerald-400/15 dark:text-emerald-300 dark:shadow-[inset_2px_0_0_0_var(--color-emerald-400)];
   }
 
   /* Controls */
   .btn {
     @apply inline-flex h-9 items-center justify-center gap-2 rounded-lg px-3.5 text-sm font-medium whitespace-nowrap transition-all focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:outline-none disabled:opacity-50;
   }
-  .btn-outline { @apply border border-white/10 bg-white/[0.02] text-zinc-200 hover:border-white/20 hover:bg-white/[0.06]; }
-  .btn-ghost { @apply text-zinc-400 hover:bg-white/[0.05] hover:text-zinc-100; }
+  .btn-outline { @apply border border-line-strong bg-surface text-fg hover:bg-tint; }
+  .btn-ghost { @apply text-fg-muted hover:bg-tint hover:text-fg; }
   .btn-primary {
-    @apply bg-gradient-to-b from-emerald-400 to-emerald-500 text-emerald-950 shadow-[0_0_0_1px_rgb(52_211_153/0.4),0_8px_24px_-6px_rgb(16_185_129/0.6)] hover:from-emerald-300 hover:to-emerald-400;
+    @apply bg-gradient-to-b from-emerald-400 to-emerald-500 text-emerald-950 shadow-[0_0_0_1px_rgb(16_185_129/0.45),0_6px_18px_-6px_rgb(16_185_129/0.55)] hover:from-emerald-300 hover:to-emerald-400;
   }
   .btn-sm { @apply h-7 gap-1.5 rounded-md px-2.5 text-xs; }
   .input {
-    @apply h-9 w-full rounded-lg border border-white/10 bg-zinc-950/60 px-3 text-sm text-zinc-100 placeholder:text-zinc-500 transition-colors focus:border-emerald-400/50 focus:ring-2 focus:ring-emerald-400/20 focus:outline-none;
+    @apply h-9 w-full rounded-lg border border-line-strong bg-surface-solid/70 px-3 text-sm text-fg placeholder:text-fg-subtle transition-colors focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-400/20 focus:outline-none;
   }
 
   /* Tables */
   .table { @apply w-full text-left text-sm tabular-nums; }
-  .table th { @apply h-10 px-4 text-xs font-medium tracking-wide whitespace-nowrap text-zinc-500; }
-  .table td { @apply border-t border-white/[0.05] px-4 py-3 align-middle whitespace-nowrap text-zinc-300; }
-  .table tbody tr { @apply transition-colors hover:bg-white/[0.025]; }
+  .table th { @apply h-10 px-4 text-xs font-medium tracking-wide whitespace-nowrap text-fg-subtle; }
+  .table td { @apply border-t border-line px-4 py-3 align-middle whitespace-nowrap text-fg-muted; }
+  .table tbody tr { @apply transition-colors hover:bg-hover; }
 
   /* Status badges */
   .badge { @apply inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs font-medium whitespace-nowrap; }
-  .badge-good { @apply border-emerald-400/20 bg-emerald-400/10 text-emerald-300; }
-  .badge-good .badge-dot { @apply bg-emerald-400; }
-  .badge-info { @apply border-sky-400/20 bg-sky-400/10 text-sky-300; }
-  .badge-info .badge-dot { @apply bg-sky-400; }
-  .badge-warn { @apply border-amber-400/20 bg-amber-400/10 text-amber-300; }
-  .badge-warn .badge-dot { @apply bg-amber-400; }
-  .badge-bad { @apply border-rose-400/20 bg-rose-400/10 text-rose-300; }
-  .badge-bad .badge-dot { @apply bg-rose-400; }
-  .badge-muted { @apply border-white/10 bg-white/[0.04] text-zinc-400; }
-  .badge-muted .badge-dot { @apply bg-zinc-400; }
+  .badge-good { @apply border-emerald-600/20 bg-emerald-500/10 text-emerald-700 dark:border-emerald-400/20 dark:bg-emerald-400/10 dark:text-emerald-300; }
+  .badge-good .badge-dot { @apply bg-emerald-500 dark:bg-emerald-400; }
+  .badge-info { @apply border-sky-600/20 bg-sky-500/10 text-sky-700 dark:border-sky-400/20 dark:bg-sky-400/10 dark:text-sky-300; }
+  .badge-info .badge-dot { @apply bg-sky-500 dark:bg-sky-400; }
+  .badge-warn { @apply border-amber-600/25 bg-amber-500/10 text-amber-700 dark:border-amber-400/20 dark:bg-amber-400/10 dark:text-amber-300; }
+  .badge-warn .badge-dot { @apply bg-amber-500 dark:bg-amber-400; }
+  .badge-bad { @apply border-rose-600/20 bg-rose-500/10 text-rose-700 dark:border-rose-400/20 dark:bg-rose-400/10 dark:text-rose-300; }
+  .badge-bad .badge-dot { @apply bg-rose-500 dark:bg-rose-400; }
+  .badge-muted { @apply border-line-strong bg-tint text-fg-muted; }
+  .badge-muted .badge-dot { @apply bg-fg-subtle; }
 
-  .kbd { @apply rounded border border-white/10 bg-white/[0.04] px-1.5 py-0.5 font-mono text-[11px] text-zinc-400; }
+  .kbd { @apply rounded border border-line-strong bg-tint px-1.5 py-0.5 font-mono text-[11px] text-fg-muted; }
+  .accent-text { @apply text-emerald-700 dark:text-emerald-300; }
+  .danger-text { @apply text-rose-600 dark:text-rose-300; }
 }

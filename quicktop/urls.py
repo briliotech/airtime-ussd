@@ -6,6 +6,10 @@ from django.views.generic import RedirectView
 
 from accounts.models import Customer
 
+admin.site.site_header = 'QuickTop Admin'
+admin.site.site_title = 'QuickTop Admin'
+admin.site.index_title = 'Manage QuickTop'
+
 
 def health(request):
     # Touch a migrated table so a missing database or unapplied migrations fail the deploy.
