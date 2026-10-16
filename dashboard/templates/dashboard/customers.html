@@ -1,26 +1,35 @@
 {% extends "dashboard/base.html" %}
 {% load dashboard_tags %}
 {% block title %}Customers{% endblock %}
+{% block heading %}Customers{% endblock %}
+{% block subheading %}Everyone who has dialled QuickTop, with their purchase history{% endblock %}
 {% block content %}
-<h1>Customers</h1>
 {% include "dashboard/_list_controls.html" with placeholder="Search phone number" %}
-<div class="panel">
-  <div class="table-wrap">
-  <table>
-    <thead><tr><th>Phone</th><th>Network</th><th class="num">Purchases</th><th class="num">Airtime delivered</th><th>Last purchase</th><th>Last dialled</th><th>First seen</th></tr></thead>
+<div class="card overflow-hidden">
+  <div class="overflow-x-auto">
+  <table class="table">
+    <thead><tr><th>Customer</th><th>Network</th><th class="text-right">Purchases</th><th class="text-right">Airtime delivered</th><th>Last purchase</th><th>Last dialled</th><th>First seen</th></tr></thead>
     <tbody>
     {% for c in object_list %}
       <tr>
-        <td><a href="{% url 'dashboard:purchases' %}?q={{ c.phone_number }}">{{ c.phone_number|phone }}</a></td>
-        <td>{{ c.network|default:"—" }}</td>
-        <td class="num">{{ c.purchase_count }}</td>
-        <td class="num">{{ c.delivered_value|kes }}</td>
-        <td>{{ c.last_purchase|date:"d M, H:i"|default:"—" }}</td>
-        <td>{{ c.last_seen_at|date:"d M, H:i" }}</td>
-        <td>{{ c.created_at|date:"d M Y" }}</td>
+        <td>
+          <a href="{% url 'dashboard:purchases' %}?q={{ c.phone_number }}" class="group inline-flex items-center gap-3">
+            <span class="grid size-8 place-items-center rounded-full bg-gradient-to-br from-emerald-400/20 to-cyan-400/20 font-mono text-[11px] text-emerald-200 ring-1 ring-white/10">{{ c.phone_number|slice:"-2:" }}</span>
+            <span class="font-mono text-[13px] text-zinc-200 group-hover:text-emerald-300">{{ c.phone_number|phone }}</span>
+          </a>
+        </td>
+        <td class="text-zinc-400">{{ c.network|default:"—" }}</td>
+        <td class="text-right font-medium">{{ c.purchase_count }}</td>
+        <td class="text-right">{{ c.delivered_value|kes }}</td>
+        <td class="text-zinc-500">{{ c.last_purchase|date:"d M · H:i"|default:"—" }}</td>
+        <td class="text-zinc-500">{{ c.last_seen_at|date:"d M · H:i" }}</td>
+        <td class="text-zinc-500">{{ c.created_at|date:"d M Y" }}</td>
       </tr>
     {% empty %}
-      <tr><td colspan="7" class="empty">No customers found.</td></tr>
+      <tr><td colspan="7" class="py-16 text-center text-zinc-500">
+        <div class="mx-auto mb-3 grid size-10 place-items-center rounded-xl border border-white/10 bg-white/[0.03] text-zinc-400">{% icon "users" %}</div>
+        No customers found.
+      </td></tr>
     {% endfor %}
     </tbody>
   </table>

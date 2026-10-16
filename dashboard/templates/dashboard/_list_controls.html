@@ -1,11 +1,21 @@
-<form class="filters" method="get">
-  <input type="search" name="q" value="{{ q }}" placeholder="{{ placeholder }}">
+{% load dashboard_tags %}
+<form method="get" class="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center">
+  <div class="relative w-full sm:max-w-md">
+    <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-zinc-500">{% icon "search" %}</span>
+    <input type="search" name="q" value="{{ q }}" placeholder="{{ placeholder }}" class="input pl-9">
+  </div>
   {% if status_choices %}
-  <select name="status" onchange="this.form.submit()">
-    <option value="">All statuses</option>
-    {% for value, label in status_choices %}<option value="{{ value }}" {% if value == status %}selected{% endif %}>{{ label }}</option>{% endfor %}
-  </select>
+  <div class="relative">
+    <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-zinc-500">{% icon "filter" "size-3.5" %}</span>
+    <select name="status" onchange="this.form.submit()" class="input appearance-none pr-8 pl-8 sm:w-52">
+      <option value="">All statuses</option>
+      {% for value, label in status_choices %}<option value="{{ value }}" {% if value == status %}selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+    <span class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-500">{% icon "chevron-right" "size-3.5 rotate-90" %}</span>
+  </div>
   {% endif %}
-  <button type="submit">Search</button>
-  {% if q or status %}<a href="?" class="muted" style="align-self:center">Clear</a>{% endif %}
+  <div class="flex gap-2">
+    <button type="submit" class="btn btn-outline">Search</button>
+    {% if q or status %}<a href="?" class="btn btn-ghost">{% icon "x" "size-3.5" %}Clear</a>{% endif %}
+  </div>
 </form>

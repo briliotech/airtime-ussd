@@ -1,113 +1,105 @@
-{% load dashboard_tags %}<!doctype html>
+{% load static dashboard_tags %}<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Dashboard{% endblock %} · QuickTop</title>
-  <style>
-    :root {
-      --bg: #f6f7f9; --panel: #fff; --text: #16181d; --muted: #6b7280; --line: #e5e7eb;
-      --accent: #0f9d58; --accent-soft: #e7f6ee;
-      --good: #0f7b46; --good-bg: #e3f5ea; --info: #1d5fbf; --info-bg: #e6effc;
-      --warn: #9a5b00; --warn-bg: #fdf1dc; --bad: #b42318; --bad-bg: #fde8e7;
-      --muted-bg: #f0f1f3;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #0f1115; --panel: #171a21; --text: #e8eaee; --muted: #9aa1ad; --line: #272b34;
-        --accent: #34c27a; --accent-soft: #15291f;
-        --good: #5fd39a; --good-bg: #133022; --info: #7fb0ff; --info-bg: #15243d;
-        --warn: #f0b85a; --warn-bg: #33270f; --bad: #ff8a80; --bad-bg: #3a1715;
-        --muted-bg: #22262e;
-      }
-    }
-    * { box-sizing: border-box; }
-    body { margin: 0; font: 14px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); }
-    a { color: inherit; }
-    .layout { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
-    nav { background: var(--panel); border-right: 1px solid var(--line); padding: 20px 12px; }
-    .brand { font-weight: 700; font-size: 18px; padding: 0 10px 18px; }
-    .brand span { color: var(--accent); }
-    nav a { display: block; padding: 8px 10px; border-radius: 8px; text-decoration: none; color: var(--muted); margin-bottom: 2px; }
-    nav a:hover { background: var(--muted-bg); color: var(--text); }
-    nav a.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
-    nav .foot { margin-top: 24px; border-top: 1px solid var(--line); padding-top: 12px; }
-    main { padding: 24px 28px; min-width: 0; }
-    h1 { font-size: 22px; margin: 0 0 18px; }
-    h2 { font-size: 15px; margin: 0 0 12px; }
-    .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
-    .grid { display: grid; gap: 14px; }
-    .stats { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); margin-bottom: 14px; }
-    .stat .label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
-    .stat .value { font-size: 24px; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
-    .stat .sub { color: var(--muted); font-size: 12px; }
-    .stat.alert { border-color: var(--bad); }
-    .stat.alert .value { color: var(--bad); }
-    .two { grid-template-columns: 1fr 1fr; margin-top: 14px; }
-    .table-wrap { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
-    th { text-align: left; font-size: 12px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
-    th, td { padding: 9px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; vertical-align: top; }
-    tr:last-child td { border-bottom: 0; }
-    td.wrap { white-space: normal; min-width: 180px; color: var(--muted); }
-    .num { text-align: right; }
-    .mono { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 12.5px; }
-    .muted { color: var(--muted); }
-    .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; }
-    .badge.good { color: var(--good); background: var(--good-bg); }
-    .badge.info { color: var(--info); background: var(--info-bg); }
-    .badge.warn { color: var(--warn); background: var(--warn-bg); }
-    .badge.bad { color: var(--bad); background: var(--bad-bg); }
-    .badge.muted { color: var(--muted); background: var(--muted-bg); }
-    form.filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
-    input, select, button { font: inherit; padding: 7px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--text); }
-    input[type=search] { min-width: 260px; flex: 1; max-width: 420px; }
-    button { cursor: pointer; }
-    button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
-    button.small { padding: 3px 10px; font-size: 12px; }
-    .pager { display: flex; gap: 12px; align-items: center; justify-content: flex-end; margin-top: 12px; color: var(--muted); }
-    .pager a { text-decoration: none; padding: 5px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--text); }
-    .messages { list-style: none; padding: 0; margin: 0 0 14px; }
-    .messages li { padding: 10px 14px; border-radius: 8px; margin-bottom: 6px; }
-    .messages .success { background: var(--good-bg); color: var(--good); }
-    .messages .error { background: var(--bad-bg); color: var(--bad); }
-    .chart { display: flex; align-items: flex-end; gap: 6px; height: 160px; padding-top: 8px; }
-    .bar { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; min-width: 0; }
-    .bar .fill { width: 100%; max-width: 34px; background: var(--accent); border-radius: 4px 4px 0 0; min-height: 2px; }
-    .bar .fill.zero { background: var(--line); }
-    .bar .day { font-size: 11px; color: var(--muted); margin-top: 6px; }
-    .empty { color: var(--muted); padding: 24px; text-align: center; }
-    .head { display: flex; justify-content: space-between; align-items: baseline; }
-    .head a { font-size: 13px; color: var(--muted); }
-    @media (max-width: 900px) {
-      .layout { grid-template-columns: 1fr; }
-      nav { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; border-right: 0; border-bottom: 1px solid var(--line); padding: 12px 16px; }
-      .brand { padding: 0 12px 0 0; }
-      nav .foot { margin: 0 0 0 auto; border: 0; padding: 0; display: flex; }
-      main { padding: 16px; }
-      .two { grid-template-columns: 1fr; }
-      input[type=search] { min-width: 0; }
-    }
-  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'dashboard/app.css' %}">
+  {% block head %}{% endblock %}
 </head>
-<body>
-<div class="layout">
-  <nav>
-    <div class="brand">Quick<span>Top</span></div>
-    <a href="{% url 'dashboard:overview' %}" class="{% if active == 'overview' %}active{% endif %}">Overview</a>
-    <a href="{% url 'dashboard:purchases' %}" class="{% if active == 'purchases' %}active{% endif %}">Airtime purchases</a>
-    <a href="{% url 'dashboard:payments' %}" class="{% if active == 'payments' %}active{% endif %}">M-Pesa payments</a>
-    <a href="{% url 'dashboard:sessions' %}" class="{% if active == 'sessions' %}active{% endif %}">USSD sessions</a>
-    <a href="{% url 'dashboard:customers' %}" class="{% if active == 'customers' %}active{% endif %}">Customers</a>
-    <div class="foot">
-      <a href="{% url 'admin:index' %}">Django admin</a>
-      <form method="post" action="{% url 'admin:logout' %}">{% csrf_token %}<button type="submit" style="border:0;background:none;color:var(--muted);padding:8px 10px;">Log out</button></form>
+<body class="min-h-screen bg-zinc-950 font-sans text-zinc-100 antialiased selection:bg-emerald-400/30">
+
+  {# Ambient background: top glow + fading grid #}
+  <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+    <div class="absolute -top-40 left-1/2 h-[480px] w-[900px] -translate-x-1/2 rounded-full bg-emerald-500/10 blur-[120px]"></div>
+    <div class="absolute top-20 -right-40 h-[360px] w-[520px] rounded-full bg-cyan-500/[0.07] blur-[120px]"></div>
+    <div class="absolute inset-0 bg-[linear-gradient(to_right,rgb(255_255_255/0.035)_1px,transparent_1px),linear-gradient(to_bottom,rgb(255_255_255/0.035)_1px,transparent_1px)] bg-[size:56px_56px] [mask-image:radial-gradient(ellipse_70%_55%_at_50%_0%,black,transparent)]"></div>
+  </div>
+
+  <div class="flex min-h-screen">
+    {# Sidebar #}
+    <aside class="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-white/[0.06] bg-zinc-950/50 px-3 py-5 backdrop-blur-xl lg:flex">
+      <a href="{% url 'dashboard:overview' %}" class="mb-8 flex items-center gap-3 px-2">
+        <span class="grid size-9 place-items-center rounded-xl bg-gradient-to-br from-emerald-300 via-emerald-400 to-cyan-400 text-emerald-950 shadow-[0_0_24px_-4px_rgb(52_211_153/0.7)]">{% icon "zap" "size-5" %}</span>
+        <span class="leading-tight">
+          <span class="block text-[15px] font-semibold tracking-tight">QuickTop</span>
+          <span class="block text-xs text-zinc-500">Operations console</span>
+        </span>
+      </a>
+
+      <p class="mb-2 px-3 text-[11px] font-medium tracking-wider text-zinc-600 uppercase">Monitor</p>
+      <nav class="space-y-0.5">
+        <a href="{% url 'dashboard:overview' %}" class="nav-link {% if active == 'overview' %}is-active{% endif %}">{% icon "dashboard" %}Overview</a>
+        <a href="{% url 'dashboard:purchases' %}" class="nav-link {% if active == 'purchases' %}is-active{% endif %}">{% icon "zap" %}Airtime purchases</a>
+        <a href="{% url 'dashboard:payments' %}" class="nav-link {% if active == 'payments' %}is-active{% endif %}">{% icon "wallet" %}M-Pesa payments</a>
+        <a href="{% url 'dashboard:sessions' %}" class="nav-link {% if active == 'sessions' %}is-active{% endif %}">{% icon "terminal" %}USSD sessions</a>
+        <a href="{% url 'dashboard:customers' %}" class="nav-link {% if active == 'customers' %}is-active{% endif %}">{% icon "users" %}Customers</a>
+      </nav>
+
+      <p class="mt-8 mb-2 px-3 text-[11px] font-medium tracking-wider text-zinc-600 uppercase">System</p>
+      <nav class="space-y-0.5">
+        <a href="{% url 'admin:index' %}" class="nav-link">{% icon "shield" %}Django admin</a>
+      </nav>
+
+      <div class="mt-auto rounded-xl border border-white/[0.06] bg-white/[0.02] p-3">
+        <div class="flex items-center gap-3">
+          <span class="grid size-8 place-items-center rounded-full bg-gradient-to-br from-zinc-700 to-zinc-800 text-xs font-semibold uppercase ring-1 ring-white/10">{{ request.user.get_username|slice:":2" }}</span>
+          <div class="min-w-0 flex-1">
+            <p class="truncate text-sm font-medium">{{ request.user.get_username }}</p>
+            <p class="text-xs text-zinc-500">Staff</p>
+          </div>
+          <form method="post" action="{% url 'admin:logout' %}">{% csrf_token %}
+            <button type="submit" class="btn btn-ghost size-8 px-0" title="Log out">{% icon "logout" %}</button>
+          </form>
+        </div>
+      </div>
+    </aside>
+
+    <div class="min-w-0 flex-1">
+      {# Mobile top bar #}
+      <div class="sticky top-0 z-20 border-b border-white/[0.06] bg-zinc-950/80 backdrop-blur-xl lg:hidden">
+        <div class="flex items-center justify-between px-4 py-3">
+          <a href="{% url 'dashboard:overview' %}" class="flex items-center gap-2 font-semibold">
+            <span class="grid size-7 place-items-center rounded-lg bg-gradient-to-br from-emerald-300 to-cyan-400 text-emerald-950">{% icon "zap" "size-4" %}</span>QuickTop
+          </a>
+          <form method="post" action="{% url 'admin:logout' %}">{% csrf_token %}<button class="btn btn-ghost btn-sm">{% icon "logout" "size-3.5" %}Log out</button></form>
+        </div>
+        <nav class="flex gap-1 overflow-x-auto px-3 pb-3 text-sm">
+          <a href="{% url 'dashboard:overview' %}" class="nav-link shrink-0 {% if active == 'overview' %}is-active{% endif %}">Overview</a>
+          <a href="{% url 'dashboard:purchases' %}" class="nav-link shrink-0 {% if active == 'purchases' %}is-active{% endif %}">Purchases</a>
+          <a href="{% url 'dashboard:payments' %}" class="nav-link shrink-0 {% if active == 'payments' %}is-active{% endif %}">Payments</a>
+          <a href="{% url 'dashboard:sessions' %}" class="nav-link shrink-0 {% if active == 'sessions' %}is-active{% endif %}">Sessions</a>
+          <a href="{% url 'dashboard:customers' %}" class="nav-link shrink-0 {% if active == 'customers' %}is-active{% endif %}">Customers</a>
+        </nav>
+      </div>
+
+      <main class="mx-auto max-w-[1400px] px-4 py-6 sm:px-6 lg:px-10 lg:py-10">
+        {% if messages %}
+        <div class="mb-6 space-y-2">
+          {% for m in messages %}
+          <div class="flex items-start gap-3 rounded-xl border px-4 py-3 text-sm backdrop-blur-xl {% if m.tags == 'error' %}border-rose-400/20 bg-rose-400/10 text-rose-200{% else %}border-emerald-400/20 bg-emerald-400/10 text-emerald-200{% endif %}">
+            {% if m.tags == 'error' %}{% icon "alert" "size-4 mt-0.5 shrink-0" %}{% else %}{% icon "retry" "size-4 mt-0.5 shrink-0" %}{% endif %}
+            <span>{{ m }}</span>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <header class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">{% block heading %}{% endblock %}</h1>
+            <p class="mt-1 text-sm text-zinc-500">{% block subheading %}{% endblock %}</p>
+          </div>
+          <div class="flex items-center gap-2">{% block actions %}{% endblock %}</div>
+        </header>
+
+        {% block content %}{% endblock %}
+      </main>
     </div>
-  </nav>
-  <main>
-    {% if messages %}<ul class="messages">{% for m in messages %}<li class="{{ m.tags }}">{{ m }}</li>{% endfor %}</ul>{% endif %}
-    {% block content %}{% endblock %}
-  </main>
-</div>
+  </div>
+  {% block scripts %}{% endblock %}
 </body>
 </html>

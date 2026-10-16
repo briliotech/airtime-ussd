@@ -70,3 +70,19 @@ You don't need to set `PUBLIC_BASE_URL` or `ALLOWED_HOSTS` on Railway. Both are 
 Open the developer portal and go to **USSD Sandbox → Simulator**. Enter a Kenyan number, dial your channel code, and
 step through the menus. The **Sessions** page shows each request and reply. An `HTTP 401` there means the
 `BRILIO_CALLBACK_SECRETS` value doesn't match the channel's test secret.
+
+## Dashboard
+
+Staff-only console at `/dashboard/`. Log in with a Django admin account. It shows collections, deliveries,
+refunds due, the conversion funnel, and searchable lists of purchases, M-Pesa payments, USSD sessions and
+customers. Use **Retry airtime** on a failed, paid purchase once your Statum balance has been topped up.
+
+The styles are Tailwind, compiled into `dashboard/static/dashboard/app.css`, which is committed so Railway
+doesn't need Node. After you change a dashboard template, rebuild the CSS:
+
+```bash
+npm i --no-save --no-package-lock tailwindcss@4.1.11 @tailwindcss/cli@4.1.11
+npx @tailwindcss/cli -i dashboard/assets/tailwind.css -o dashboard/static/dashboard/app.css --minify
+```
+
+Don't add a `package.json`. Railway would then try to build the app as a Node project.

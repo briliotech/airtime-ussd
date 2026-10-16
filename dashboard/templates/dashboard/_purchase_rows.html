@@ -1,33 +1,37 @@
 {% load dashboard_tags %}
-<div class="table-wrap">
-<table>
+<div class="overflow-x-auto">
+<table class="table">
   <thead><tr>
-    <th>Time</th><th>Paid by</th><th>Recipient</th><th class="num">Amount</th><th>Status</th><th>M-Pesa receipt</th>{% if full %}<th class="num">Statum charge</th><th>Details</th>{% endif %}<th></th>
+    <th>Time</th><th>Recipient</th><th class="text-right">Amount</th><th>Status</th><th>M-Pesa receipt</th>{% if full %}<th>Details</th>{% endif %}<th><span class="sr-only">Actions</span></th>
   </tr></thead>
   <tbody>
   {% for p in purchases %}
     <tr>
-      <td>{{ p.created_at|date:"d M, H:i" }}</td>
-      <td>{{ p.customer.phone_number|phone }}</td>
-      <td>{{ p.recipient_phone|phone }}</td>
-      <td class="num">{{ p.amount|kes }}</td>
-      <td><span class="badge {{ p.status|tone }}">{{ p.get_status_display }}</span></td>
-      <td class="mono">{{ p.payment.mpesa_receipt_number|default:"—" }}</td>
-      {% if full %}
-      <td class="num">{{ p.statum_charge|kes }}</td>
-      <td class="wrap">{{ p.result_desc|default:p.payment.result_desc|default:"" }}</td>
-      {% endif %}
+      <td class="text-zinc-500">{{ p.created_at|date:"d M · H:i" }}</td>
       <td>
+        <span class="font-mono text-[13px] text-zinc-200">{{ p.recipient_phone|phone }}</span>
+        {% if full %}<span class="block text-xs text-zinc-500">{% if p.recipient_phone == p.customer.phone_number %}own number{% else %}paid by <span class="font-mono">{{ p.customer.phone_number|phone }}</span>{% endif %}</span>{% endif %}
+      </td>
+      <td class="text-right font-medium text-zinc-100">{{ p.amount|kes }}</td>
+      <td>{% status_badge p.status p.get_status_display %}</td>
+      <td>{% if p.payment.mpesa_receipt_number %}<span class="kbd">{{ p.payment.mpesa_receipt_number }}</span>{% else %}<span class="text-zinc-600">—</span>{% endif %}</td>
+      {% if full %}
+      <td class="text-zinc-500"><div class="max-w-[14rem] truncate" title="{{ p.result_desc|default:p.payment.result_desc }}{% if p.statum_charge %} · Statum charged {{ p.statum_charge|kes }}{% endif %}">{{ p.result_desc|default:p.payment.result_desc|default:"" }}</div></td>
+      {% endif %}
+      <td class="text-right">
         {% if p.status == 'failed' and p.payment.status == 'success' %}
         <form method="post" action="{% url 'dashboard:retry-purchase' p.pk %}" onsubmit="return confirm('Resend KES {{ p.amount|floatformat:0 }} airtime to {{ p.recipient_phone|phone }}?')">
           {% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
-          <button class="primary small" type="submit">Retry airtime</button>
+          <button class="btn btn-primary btn-sm" type="submit" title="Resend airtime">{% icon "retry" "size-3.5" %}{% if full %}Retry airtime{% else %}Retry{% endif %}</button>
         </form>
         {% endif %}
       </td>
     </tr>
   {% empty %}
-    <tr><td colspan="9" class="empty">No purchases yet.</td></tr>
+    <tr><td colspan="7" class="py-16 text-center text-zinc-500">
+      <div class="mx-auto mb-3 grid size-10 place-items-center rounded-xl border border-white/10 bg-white/[0.03] text-zinc-400">{% icon "zap" %}</div>
+      No purchases yet.
+    </td></tr>
   {% endfor %}
   </tbody>
 </table>

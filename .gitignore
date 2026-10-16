@@ -225,3 +225,7 @@ staticfiles/
 # Local env files with real secrets (keep .env.example as the template)
 .env.*
 !.env.example
+
+# Tailwind build tooling (dashboard CSS)
+node_modules/
+package-lock.json

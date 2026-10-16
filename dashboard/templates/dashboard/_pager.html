@@ -1,9 +1,12 @@
-{% if is_paginated %}
-<div class="pager">
-  {% if page_obj.has_previous %}<a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.previous_page_number }}">← Newer</a>{% endif %}
-  <span>Page {{ page_obj.number }} of {{ paginator.num_pages }} · {{ paginator.count }} total</span>
-  {% if page_obj.has_next %}<a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.next_page_number }}">Older →</a>{% endif %}
+{% load dashboard_tags %}
+{% if paginator %}
+<div class="flex items-center justify-between gap-4 border-t border-white/[0.05] px-4 py-3 text-xs text-zinc-500">
+  <span>{% if is_paginated %}Page {{ page_obj.number }} of {{ paginator.num_pages }} · {% endif %}{{ paginator.count }} record{{ paginator.count|pluralize }}</span>
+  {% if is_paginated %}
+  <div class="flex gap-1.5">
+    {% if page_obj.has_previous %}<a class="btn btn-outline btn-sm" href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.previous_page_number }}">{% icon "chevron-left" "size-3.5" %}Newer</a>{% endif %}
+    {% if page_obj.has_next %}<a class="btn btn-outline btn-sm" href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.next_page_number }}">Older{% icon "chevron-right" "size-3.5" %}</a>{% endif %}
+  </div>
+  {% endif %}
 </div>
-{% elif paginator %}
-<div class="pager"><span>{{ paginator.count }} total</span></div>
 {% endif %}

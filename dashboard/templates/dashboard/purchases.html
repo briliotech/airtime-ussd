@@ -1,9 +1,10 @@
 {% extends "dashboard/base.html" %}
 {% block title %}Airtime purchases{% endblock %}
+{% block heading %}Airtime purchases{% endblock %}
+{% block subheading %}Every order placed through USSD, from M-Pesa payment to Statum delivery{% endblock %}
 {% block content %}
-<h1>Airtime purchases</h1>
 {% include "dashboard/_list_controls.html" with placeholder="Search phone, M-Pesa receipt or Statum ID" %}
-<div class="panel">
+<div class="card overflow-hidden">
   {% include "dashboard/_purchase_rows.html" with purchases=object_list full=True %}
   {% include "dashboard/_pager.html" %}
 </div>

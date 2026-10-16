@@ -20,6 +20,15 @@ from ussd.models import UssdSession
 
 CHART_DAYS = 14
 
+STATUS_COLORS = {
+    'delivered': '#34d399',
+    'sending': '#38bdf8',
+    'paid': '#818cf8',
+    'awaiting_payment': '#a1a1aa',
+    'payment_failed': '#fbbf24',
+    'failed': '#fb7185',
+}
+
 
 def _total(queryset, field='amount'):
     return queryset.aggregate(total=Sum(field))['total'] or Decimal('0')
@@ -51,11 +60,29 @@ def overview(request):
         .annotate(total=Sum('amount'))
     }
     days = [(start + timedelta(days=i)).date() for i in range(CHART_DAYS)]
-    chart_max = max(by_day.values(), default=0) or 1
-    chart = [
-        {'day': day, 'total': by_day.get(day, 0), 'pct': int(100 * (by_day.get(day, 0) / chart_max))}
-        for day in days
+    collections_chart = {
+        'labels': [day.strftime('%d %b') for day in days],
+        'values': [float(by_day.get(day, 0)) for day in days],
+    }
+
+    status_counts = [
+        {
+            **row,
+            'label': AirtimePurchase.Status(row['status']).label,
+            'color': STATUS_COLORS.get(row['status'], '#71717a'),
+        }
+        for row in AirtimePurchase.objects.values('status').annotate(n=Count('id')).order_by('-n')
     ]
+
+    # Where subscribers drop off between dialling and receiving airtime.
+    funnel_steps = [
+        ('USSD sessions', UssdSession.objects.count()),
+        ('Orders confirmed', AirtimePurchase.objects.count()),
+        ('Paid on M-Pesa', AirtimePurchase.objects.filter(payment__status=MpesaPayment.Status.SUCCESS).count()),
+        ('Airtime delivered', delivered.count()),
+    ]
+    top = funnel_steps[0][1] or 1
+    funnel = [{'label': label, 'n': n, 'pct': round(100 * n / top)} for label, n in funnel_steps]
 
     context = {
         'stats': {
@@ -71,11 +98,16 @@ def overview(request):
             'customers': Customer.objects.count(),
             'statum_charges': _total(delivered, 'statum_charge'),
         },
-        'status_counts': [
-            {**row, 'label': AirtimePurchase.Status(row['status']).label}
-            for row in AirtimePurchase.objects.values('status').annotate(n=Count('id')).order_by('-n')
-        ],
-        'chart': chart,
+        'status_counts': status_counts,
+        'status_total': sum(row['n'] for row in status_counts),
+        'status_chart': {
+            'labels': [row['label'] for row in status_counts],
+            'values': [row['n'] for row in status_counts],
+            'colors': [row['color'] for row in status_counts],
+        },
+        'collections_chart': collections_chart,
+        'funnel': funnel,
+        'now': now,
         'recent_purchases': AirtimePurchase.objects.select_related('customer', 'payment')[:8],
         'recent_sessions': UssdSession.objects.all()[:8],
         'active': 'overview',

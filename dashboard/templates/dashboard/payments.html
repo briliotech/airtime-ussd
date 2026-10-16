@@ -1,27 +1,31 @@
 {% extends "dashboard/base.html" %}
 {% load dashboard_tags %}
 {% block title %}M-Pesa payments{% endblock %}
+{% block heading %}M-Pesa payments{% endblock %}
+{% block subheading %}STK push requests and the result Daraja reported for each{% endblock %}
 {% block content %}
-<h1>M-Pesa payments</h1>
 {% include "dashboard/_list_controls.html" with placeholder="Search phone, receipt or CheckoutRequestID" %}
-<div class="panel">
-  <div class="table-wrap">
-  <table>
-    <thead><tr><th>Time</th><th>Phone</th><th class="num">Amount</th><th>Status</th><th>Receipt</th><th>For</th><th>Result</th><th>CheckoutRequestID</th></tr></thead>
+<div class="card overflow-hidden">
+  <div class="overflow-x-auto">
+  <table class="table">
+    <thead><tr><th>Time</th><th>Phone</th><th class="text-right">Amount</th><th>Status</th><th>Receipt</th><th>For</th><th>Result</th><th>CheckoutRequestID</th></tr></thead>
     <tbody>
     {% for p in object_list %}
       <tr>
-        <td>{{ p.created_at|date:"d M, H:i" }}</td>
-        <td>{{ p.phone_number|phone }}</td>
-        <td class="num">{{ p.amount|kes }}</td>
-        <td><span class="badge {{ p.status|tone }}">{{ p.get_status_display }}</span></td>
-        <td class="mono">{{ p.mpesa_receipt_number|default:"—" }}</td>
-        <td>{% if p.airtime_purchase %}Airtime → {{ p.airtime_purchase.recipient_phone|phone }}{% else %}{{ p.description }}{% endif %}</td>
-        <td class="wrap">{% if p.result_code is not None %}<span class="mono">{{ p.result_code }}</span> · {% endif %}{{ p.result_desc|default:"" }}</td>
-        <td class="mono muted">{{ p.checkout_request_id|default:"—" }}</td>
+        <td class="text-zinc-500">{{ p.created_at|date:"d M · H:i" }}</td>
+        <td class="font-mono text-[13px]">{{ p.phone_number|phone }}</td>
+        <td class="text-right font-medium text-zinc-100">{{ p.amount|kes }}</td>
+        <td>{% status_badge p.status p.get_status_display %}</td>
+        <td>{% if p.mpesa_receipt_number %}<span class="kbd">{{ p.mpesa_receipt_number }}</span>{% else %}<span class="text-zinc-600">—</span>{% endif %}</td>
+        <td class="text-zinc-400">{% if p.airtime_purchase %}<span class="inline-flex items-center gap-1.5">{% icon "zap" "size-3.5 text-cyan-300" %}Airtime → <span class="font-mono text-[13px]">{{ p.airtime_purchase.recipient_phone|phone }}</span></span>{% else %}{{ p.description }}{% endif %}</td>
+        <td class="text-zinc-500"><div class="max-w-[18rem] truncate" title="{{ p.result_desc }}">{% if p.result_code is not None %}<span class="kbd mr-1.5">{{ p.result_code }}</span>{% endif %}{{ p.result_desc|default:"" }}</div></td>
+        <td class="font-mono text-xs text-zinc-600">{{ p.checkout_request_id|default:"—" }}</td>
       </tr>
     {% empty %}
-      <tr><td colspan="8" class="empty">No payments found.</td></tr>
+      <tr><td colspan="8" class="py-16 text-center text-zinc-500">
+        <div class="mx-auto mb-3 grid size-10 place-items-center rounded-xl border border-white/10 bg-white/[0.03] text-zinc-400">{% icon "wallet" %}</div>
+        No payments found.
+      </td></tr>
     {% endfor %}
     </tbody>
   </table>

@@ -1,19 +1,22 @@
 {% load dashboard_tags %}
-<div class="table-wrap">
-<table>
-  <thead><tr><th>Time</th><th>Phone</th><th>Network</th><th>Input</th><th>Last screen</th>{% if full %}<th>Session ID</th>{% endif %}</tr></thead>
+<div class="overflow-x-auto">
+<table class="table">
+  <thead><tr><th>Time</th><th>Phone</th><th>Network</th><th>Input path</th><th>Last screen</th>{% if full %}<th>Session ID</th>{% endif %}</tr></thead>
   <tbody>
   {% for s in sessions %}
     <tr>
-      <td>{{ s.created_at|date:"d M, H:i" }}</td>
-      <td>{{ s.msisdn|phone }}</td>
-      <td>{{ s.network|default:"—" }}</td>
-      <td class="mono">{{ s.text|default:"(dialled)" }}</td>
-      <td class="wrap">{% if s.ended %}<span class="badge muted">END</span> {% endif %}{{ s.last_response|truncatechars:90 }}</td>
-      {% if full %}<td class="mono muted">{{ s.session_id }}</td>{% endif %}
+      <td class="text-zinc-500">{{ s.created_at|date:"d M · H:i" }}</td>
+      <td class="font-mono text-[13px]">{{ s.msisdn|phone }}</td>
+      <td class="text-zinc-400">{{ s.network|default:"—" }}</td>
+      <td>{% if s.text %}<span class="kbd text-emerald-300/90">{{ s.text }}</span>{% else %}<span class="text-zinc-600">dialled</span>{% endif %}</td>
+      <td class="text-zinc-400"><div class="max-w-[28rem] truncate" title="{{ s.last_response|oneline }}">{% if s.ended %}<span class="mr-2 rounded bg-white/[0.06] px-1.5 py-0.5 font-mono text-[10px] text-zinc-400">END</span>{% else %}<span class="mr-2 rounded bg-emerald-400/10 px-1.5 py-0.5 font-mono text-[10px] text-emerald-300">CON</span>{% endif %}{{ s.last_response|oneline }}</div></td>
+      {% if full %}<td class="font-mono text-xs text-zinc-600">{{ s.session_id }}</td>{% endif %}
     </tr>
   {% empty %}
-    <tr><td colspan="6" class="empty">No sessions yet.</td></tr>
+    <tr><td colspan="6" class="py-16 text-center text-zinc-500">
+      <div class="mx-auto mb-3 grid size-10 place-items-center rounded-xl border border-white/10 bg-white/[0.03] text-zinc-400">{% icon "terminal" %}</div>
+      No USSD sessions yet.
+    </td></tr>
   {% endfor %}
   </tbody>
 </table>

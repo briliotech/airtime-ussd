@@ -25,7 +25,14 @@ def make_purchase(status, payment_status=MpesaPayment.Status.SUCCESS, session='s
     )
 
 
-@override_settings(BACKGROUND_TASKS_INLINE=True)
+# Tests don't run collectstatic, so skip the hashed-manifest storage used in production.
+PLAIN_STATIC = {
+    'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+    'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'},
+}
+
+
+@override_settings(BACKGROUND_TASKS_INLINE=True, STORAGES=PLAIN_STATIC)
 class DashboardTests(TestCase):
     def setUp(self):
         self.staff = User.objects.create_user('staff', password='pw', is_staff=True)
