@@ -1,0 +1,11 @@
+<form class="filters" method="get">
+  <input type="search" name="q" value="{{ q }}" placeholder="{{ placeholder }}">
+  {% if status_choices %}
+  <select name="status" onchange="this.form.submit()">
+    <option value="">All statuses</option>
+    {% for value, label in status_choices %}<option value="{{ value }}" {% if value == status %}selected{% endif %}>{{ label }}</option>{% endfor %}
+  </select>
+  {% endif %}
+  <button type="submit">Search</button>
+  {% if q or status %}<a href="?" class="muted" style="align-self:center">Clear</a>{% endif %}
+</form>

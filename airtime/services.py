@@ -61,6 +61,21 @@ def on_payment_completed(sender, payment, **kwargs):
         purchase.save(update_fields=['status', 'result_desc', 'updated_at'])
 
 
+def retry_airtime(purchase_id):
+    """Resend airtime for a paid purchase that failed (e.g. Statum balance was empty).
+
+    Returns False if the purchase isn't a failed purchase with a successful payment.
+    """
+    retried = AirtimePurchase.objects.filter(
+        pk=purchase_id,
+        status=AirtimePurchase.Status.FAILED,
+        payment__status=MpesaPayment.Status.SUCCESS,
+    ).update(status=AirtimePurchase.Status.PAID, statum_request_id=None, result_desc='')
+    if retried:
+        run_in_background(disburse_airtime, purchase_id)
+    return bool(retried)
+
+
 def disburse_airtime(purchase_id):
     # Claim the purchase so that a duplicate trigger can't send airtime twice.
     claimed = AirtimePurchase.objects.filter(

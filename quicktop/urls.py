@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.db import DatabaseError
 from django.http import JsonResponse
 from django.urls import include, path
+from django.views.generic import RedirectView
 
 from accounts.models import Customer
 
@@ -16,7 +17,9 @@ def health(request):
 
 
 urlpatterns = [
+    path('', RedirectView.as_view(pattern_name='dashboard:overview')),
     path('admin/', admin.site.urls),
+    path('dashboard/', include('dashboard.urls')),
     path('health/', health, name='health'),
     path('ussd/', include('ussd.urls')),
     path('payments/', include('payments.urls')),

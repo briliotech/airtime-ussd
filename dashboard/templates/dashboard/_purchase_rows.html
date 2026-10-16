@@ -1,0 +1,34 @@
+{% load dashboard_tags %}
+<div class="table-wrap">
+<table>
+  <thead><tr>
+    <th>Time</th><th>Paid by</th><th>Recipient</th><th class="num">Amount</th><th>Status</th><th>M-Pesa receipt</th>{% if full %}<th class="num">Statum charge</th><th>Details</th>{% endif %}<th></th>
+  </tr></thead>
+  <tbody>
+  {% for p in purchases %}
+    <tr>
+      <td>{{ p.created_at|date:"d M, H:i" }}</td>
+      <td>{{ p.customer.phone_number|phone }}</td>
+      <td>{{ p.recipient_phone|phone }}</td>
+      <td class="num">{{ p.amount|kes }}</td>
+      <td><span class="badge {{ p.status|tone }}">{{ p.get_status_display }}</span></td>
+      <td class="mono">{{ p.payment.mpesa_receipt_number|default:"—" }}</td>
+      {% if full %}
+      <td class="num">{{ p.statum_charge|kes }}</td>
+      <td class="wrap">{{ p.result_desc|default:p.payment.result_desc|default:"" }}</td>
+      {% endif %}
+      <td>
+        {% if p.status == 'failed' and p.payment.status == 'success' %}
+        <form method="post" action="{% url 'dashboard:retry-purchase' p.pk %}" onsubmit="return confirm('Resend KES {{ p.amount|floatformat:0 }} airtime to {{ p.recipient_phone|phone }}?')">
+          {% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button class="primary small" type="submit">Retry airtime</button>
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="9" class="empty">No purchases yet.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>

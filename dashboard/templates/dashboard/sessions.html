@@ -1,0 +1,10 @@
+{% extends "dashboard/base.html" %}
+{% block title %}USSD sessions{% endblock %}
+{% block content %}
+<h1>USSD sessions</h1>
+{% include "dashboard/_list_controls.html" with placeholder="Search phone, session ID or input" %}
+<div class="panel">
+  {% include "dashboard/_session_rows.html" with sessions=object_list full=True %}
+  {% include "dashboard/_pager.html" %}
+</div>
+{% endblock %}

@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'airtime',
     'payments',
     'ussd',
+    'dashboard',
 ]
 
 MIDDLEWARE = [

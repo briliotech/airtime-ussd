@@ -1,0 +1,78 @@
+{% extends "dashboard/base.html" %}
+{% load dashboard_tags %}
+{% block title %}Overview{% endblock %}
+{% block content %}
+<h1>Overview</h1>
+
+<div class="grid stats">
+  <div class="panel stat">
+    <div class="label">Collected today</div>
+    <div class="value">{{ stats.collected_today|kes }}</div>
+    <div class="sub">Last 7 days: {{ stats.collected_week|kes }}</div>
+  </div>
+  <div class="panel stat">
+    <div class="label">Collected all time</div>
+    <div class="value">{{ stats.collected_all|kes }}</div>
+    <div class="sub">Successful M-Pesa payments</div>
+  </div>
+  <div class="panel stat">
+    <div class="label">Airtime delivered</div>
+    <div class="value">{{ stats.delivered_value|kes }}</div>
+    <div class="sub">{{ stats.delivered_count }} purchase{{ stats.delivered_count|pluralize }} · Statum cost {{ stats.statum_charges|kes }}</div>
+  </div>
+  <div class="panel stat">
+    <div class="label">Payment success</div>
+    <div class="value">{% if stats.success_rate is None %}—{% else %}{{ stats.success_rate }}%{% endif %}</div>
+    <div class="sub">Of completed STK pushes</div>
+  </div>
+  <a class="panel stat {% if stats.refunds_due_count %}alert{% endif %}" href="{% url 'dashboard:purchases' %}?status=failed" style="text-decoration:none">
+    <div class="label">Refunds due</div>
+    <div class="value">{{ stats.refunds_due_value|kes }}</div>
+    <div class="sub">{{ stats.refunds_due_count }} paid but not delivered</div>
+  </a>
+  <div class="panel stat">
+    <div class="label">USSD sessions today</div>
+    <div class="value">{{ stats.sessions_today }}</div>
+    <div class="sub">{{ stats.customers }} customer{{ stats.customers|pluralize }} in total</div>
+  </div>
+</div>
+
+<div class="grid two" style="margin-top:0">
+  <div class="panel">
+    <h2>M-Pesa collections, last 14 days</h2>
+    <div class="chart">
+      {% for d in chart %}
+      <div class="bar" title="{{ d.day|date:'D d M' }}: {{ d.total|kes }}">
+        <div class="fill {% if not d.total %}zero{% endif %}" style="height: {{ d.pct }}%"></div>
+        <div class="day">{{ d.day|date:"d" }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="panel">
+    <h2>Purchases by status</h2>
+    <table>
+      <tbody>
+      {% for row in status_counts %}
+        <tr>
+          <td><a href="{% url 'dashboard:purchases' %}?status={{ row.status }}" style="text-decoration:none"><span class="badge {{ row.status|tone }}">{{ row.label }}</span></a></td>
+          <td class="num">{{ row.n }}</td>
+        </tr>
+      {% empty %}
+        <tr><td class="empty">No purchases yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="panel" style="margin-top:14px">
+  <div class="head"><h2>Recent airtime purchases</h2><a href="{% url 'dashboard:purchases' %}">View all →</a></div>
+  {% include "dashboard/_purchase_rows.html" with purchases=recent_purchases full=False %}
+</div>
+
+<div class="panel" style="margin-top:14px">
+  <div class="head"><h2>Recent USSD sessions</h2><a href="{% url 'dashboard:sessions' %}">View all →</a></div>
+  {% include "dashboard/_session_rows.html" with sessions=recent_sessions full=False %}
+</div>
+{% endblock %}

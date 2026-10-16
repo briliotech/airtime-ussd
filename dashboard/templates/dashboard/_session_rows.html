@@ -1,0 +1,20 @@
+{% load dashboard_tags %}
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Time</th><th>Phone</th><th>Network</th><th>Input</th><th>Last screen</th>{% if full %}<th>Session ID</th>{% endif %}</tr></thead>
+  <tbody>
+  {% for s in sessions %}
+    <tr>
+      <td>{{ s.created_at|date:"d M, H:i" }}</td>
+      <td>{{ s.msisdn|phone }}</td>
+      <td>{{ s.network|default:"—" }}</td>
+      <td class="mono">{{ s.text|default:"(dialled)" }}</td>
+      <td class="wrap">{% if s.ended %}<span class="badge muted">END</span> {% endif %}{{ s.last_response|truncatechars:90 }}</td>
+      {% if full %}<td class="mono muted">{{ s.session_id }}</td>{% endif %}
+    </tr>
+  {% empty %}
+    <tr><td colspan="6" class="empty">No sessions yet.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>

@@ -1,0 +1,30 @@
+{% extends "dashboard/base.html" %}
+{% load dashboard_tags %}
+{% block title %}Customers{% endblock %}
+{% block content %}
+<h1>Customers</h1>
+{% include "dashboard/_list_controls.html" with placeholder="Search phone number" %}
+<div class="panel">
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Phone</th><th>Network</th><th class="num">Purchases</th><th class="num">Airtime delivered</th><th>Last purchase</th><th>Last dialled</th><th>First seen</th></tr></thead>
+    <tbody>
+    {% for c in object_list %}
+      <tr>
+        <td><a href="{% url 'dashboard:purchases' %}?q={{ c.phone_number }}">{{ c.phone_number|phone }}</a></td>
+        <td>{{ c.network|default:"—" }}</td>
+        <td class="num">{{ c.purchase_count }}</td>
+        <td class="num">{{ c.delivered_value|kes }}</td>
+        <td>{{ c.last_purchase|date:"d M, H:i"|default:"—" }}</td>
+        <td>{{ c.last_seen_at|date:"d M, H:i" }}</td>
+        <td>{{ c.created_at|date:"d M Y" }}</td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="7" class="empty">No customers found.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% include "dashboard/_pager.html" %}
+</div>
+{% endblock %}

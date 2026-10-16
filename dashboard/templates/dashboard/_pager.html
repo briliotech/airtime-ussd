@@ -1,0 +1,9 @@
+{% if is_paginated %}
+<div class="pager">
+  {% if page_obj.has_previous %}<a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.previous_page_number }}">← Newer</a>{% endif %}
+  <span>Page {{ page_obj.number }} of {{ paginator.num_pages }} · {{ paginator.count }} total</span>
+  {% if page_obj.has_next %}<a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.next_page_number }}">Older →</a>{% endif %}
+</div>
+{% elif paginator %}
+<div class="pager"><span>{{ paginator.count }} total</span></div>
+{% endif %}
